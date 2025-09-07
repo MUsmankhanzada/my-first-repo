@@ -127,6 +127,31 @@ Masking padding is standard for seq2seq cross-entropy; without it, the model “
 
 **Caveats:** ensure the correct pad ID (especially if swapping tokenizers); do not reintroduce padding loss via a custom collator; if using label smoothing, apply it after masking so pads remain ignored.
 
+# Usage  
+
+You can run my implementation in two modes: **SCST RL** (penalized BLEU) and **Quality-Controlled RL**.  
+
+### 1. SCST RL (default)  
+Run self-critical sequence training on penalized BLEU with supervised fine-tuning: 
+```bash
+python bart_generation.py \
+  --use_gpu \
+  --do_supervised \
+  --supervised_epochs 8 \
+  --use_rl \
+  --rl_epochs 6
+
+### 2. Quality-Controlled RL
+Best weights :
+python bart_generation.py \
+  --use_gpu \
+  --do_supervised \
+  --supervised_epochs 8 \
+  --use_rl \
+  --rl_epochs 6
+  --quality_weights 0.7 0.2 0.1 
+
+
 # References  
 
 **Paraphrase Generation with Deep Reinforcement Learning [Li, Jiang, Shang et al., 2018]**  
