@@ -141,8 +141,11 @@ python bart_generation.py \
   --use_rl \
   --rl_epochs 6
 
-### 2. Quality-Controlled RL
+2. Quality-Controlled RL
+Enable the quality-guided reward by providing semantic, syntactic, and lexical weights.
+
 Best weights :
+```bash
 python bart_generation.py \
   --use_gpu \
   --do_supervised \
