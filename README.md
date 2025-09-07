@@ -1,3 +1,7 @@
+# Abstract  
+
+This work addresses paraphrase generation using a BART sequence-to-sequence model. We fine-tune BART with supervised maximum-likelihood estimation (MLE) and padding masking for stable training, then apply self-critical sequence training (SCST) to directly optimize a penalized BLEU reward that balances semantic fidelity with reduced copying from the source. Sentence-level SacreBLEU with smoothing provides stable rewards, combined with an MLE stabilizer, advantage normalization, and gradient clipping for robustness. An optional quality-guided reward further promotes semantic preservation, syntactic variation, and lexical diversity via user-defined weights. Experiments show that SCST improves penalized BLEU over the supervised baseline, producing more diverse, fluent paraphrases while maintaining meaning.
+
 # Methodology
 
 ## Reinforcement Learning Fine-Tuning (SCST) on Penalized BLEU with Reward Smoothing
