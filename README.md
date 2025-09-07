@@ -140,6 +140,7 @@ python bart_generation.py \
   --supervised_epochs 8 \
   --use_rl \
   --rl_epochs 6
+```
 
 2. Quality-Controlled RL
 Enable the quality-guided reward by providing semantic, syntactic, and lexical weights.
