@@ -134,12 +134,7 @@ You can run my implementation in two modes: **SCST RL** (penalized BLEU) and **Q
 ### 1. SCST RL (default)  
 Run self-critical sequence training on penalized BLEU with supervised fine-tuning: 
 ```bash
-python bart_generation.py \
-  --use_gpu \
-  --do_supervised \
-  --supervised_epochs 8 \
-  --use_rl \
-  --rl_epochs 6
+python bart_generation.py --use_gpu --do_supervised --supervised_epochs 8 --use_rl --rl_epochs 8
 ```
 
 ### 2. Quality-Controlled RL
