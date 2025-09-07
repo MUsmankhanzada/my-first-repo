@@ -46,15 +46,16 @@ For each batch, decode a greedy baseline (no sampling) and a stochastic sample (
 **Per-epoch summary (dev metrics)**
 
 | Supervised (before RL) | 42.290 | 32.234 | *26.215* |
-| --- | ---: | ---: | ---: |
+| Phase/Epoch | BLEU(ref→hyp) | 100−BLEU(input→hyp) | *Penalized BLEU* |
+|---|---:|---:|---:|
+| Supervised (before RL) | 42.290 | 32.234 | *26.215* |
 | RL Epoch 1 | 41.490 | 34.487 | *27.516* |
 | *RL Epoch 2 (best)* | *38.506* | *42.939* | *31.797* |
 | RL Epoch 3 | 38.680 | 41.769 | *31.069* |
 | RL Epoch 4 | 39.272 | 40.896 | *30.886* |
 | RL Epoch 5 | 37.558 | 43.463 | *31.392* |
 | RL Epoch 6 | 39.520 | 39.660 | *30.142* |
-
-> Table columns:[Bleu_score]   | [Bleu score with input] | *Penalized BLEU* (highlighted).  
+  
 ---
 
 ## Discussion
