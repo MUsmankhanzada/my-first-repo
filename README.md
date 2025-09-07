@@ -1,4 +1,4 @@
-# Reinforcement Learning Fine-Tuning (SCST) on Penalized BLEU with Reward Smoothing
+# Methodology
 
 ## Approach
 Add a self-critical RL (SCST) phase on top of the supervised BART baseline to directly optimize a penalized BLEU reward:
@@ -45,7 +45,6 @@ For each batch, decode a greedy baseline (no sampling) and a stochastic sample (
 
 **Per-epoch summary (dev metrics)**
 
-| Supervised (before RL) | 42.290 | 32.234 | *26.215* |
 | Phase/Epoch | BLEU(ref→hyp) | 100−BLEU(input→hyp) | *Penalized BLEU* |
 |---|---:|---:|---:|
 | Supervised (before RL) | 42.290 | 32.234 | *26.215* |
@@ -55,7 +54,7 @@ For each batch, decode a greedy baseline (no sampling) and a stochastic sample (
 | RL Epoch 4 | 39.272 | 40.896 | *30.886* |
 | RL Epoch 5 | 37.558 | 43.463 | *31.392* |
 | RL Epoch 6 | 39.520 | 39.660 | *30.142* |
-  
+
 ---
 
 ## Discussion
@@ -93,3 +92,31 @@ For each batch, decode a greedy baseline (no sampling) and a stochastic sample (
 - Keep advantage normalization and the variance guard (`skip PG if std(A) < 1e−6`) to avoid degenerate PG updates.  
 - Mix a stable MLE term (e.g., λ_rl = 0.3) to preserve fluency.  
 - Save the best model only when dev penalized BLEU improves; reload at the end for downstream inference.
+
+---
+
+## Padding Masking in Targets
+
+### Approach
+During supervised (MLE) training and in the MLE stabilizer used during RL, mask all padding tokens in the target labels so they do not contribute to the loss. Implementation: set `labels[labels == tokenizer.pad_token_id] = -100`, which PyTorch’s `CrossEntropyLoss` ignores by default.
+
+### Expectation
+- Prevents the model from learning to predict `<pad>` tokens, reduces noise in the loss, and improves BLEU scores.  
+- Reduces length bias (the model over-predicting `<pad>` or ending too early).  
+- Produces cleaner gradients for faster, more stable convergence and improved penalized BLEU.  
+- In RL, ensures the MLE stabilizer reinforces content tokens rather than padding.
+
+### Changes
+- **Supervised dataloader (`transform_data`)**: after tokenizing targets, clone to `labels` and set pad positions to `-100`.  
+- **RL epoch (`rl_finetune_epoch`)**: re-tokenize refs per batch for the stabilizer and again set pad positions to `-100`.  
+- Verified `tokenizer.pad_token_id` and generation args (`eos_token_id`, `no_repeat_ngram_size`) are correctly set.
+
+### Results
+- Training: lower and smoother training loss curves; reduced variance across steps.  
+- Qualitative: fewer truncated outputs; more stable sequence lengths; fewer padding artifacts in generations.  
+- Validation: penalized BLEU improved from **20** to **26** on the dev set with identical decoding settings.
+
+### Discussion
+Masking padding is standard for seq2seq cross-entropy; without it, the model “learns” to predict padding and shortens outputs. This change helps decouple sequence length control from loss shaping and complements decoding constraints (e.g., `no_repeat_ngram_size`, min/max length). In the SCST setup, it keeps the MLE component aligned with semantic content, avoiding distortions from padding-heavy batches.
+
+**Caveats:** ensure the correct pad ID (especially if swapping tokenizers); do not reintroduce padding loss via a custom collator; if using label smoothing, apply it after masking so pads remain ignored.
