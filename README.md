@@ -126,3 +126,18 @@ During supervised (MLE) training and in the MLE stabilizer used during RL, mask 
 Masking padding is standard for seq2seq cross-entropy; without it, the model “learns” to predict padding and shortens outputs. This change helps decouple sequence length control from loss shaping and complements decoding constraints (e.g., `no_repeat_ngram_size`, min/max length). In the SCST setup, it keeps the MLE component aligned with semantic content, avoiding distortions from padding-heavy batches.
 
 **Caveats:** ensure the correct pad ID (especially if swapping tokenizers); do not reintroduce padding loss via a custom collator; if using label smoothing, apply it after masking so pads remain ignored.
+
+# References  
+
+**Paraphrase Generation with Deep Reinforcement Learning [Li, Jiang, Shang et al., 2018]**  
+Li et al. (2018) introduced a framework where a sequence-to-sequence generator is paired with a deep matching evaluator. The generator is first trained with supervised learning and then fine-tuned with reinforcement learning, using the evaluator’s feedback as the reward signal. Compared to this, I simplified the setup by using self-critical sequence training (SCST), where the model directly compares its sampled outputs against greedy baselines under a *penalized BLEU* reward. This avoids training a separate evaluator, making the pipeline lighter while still aligning training with evaluation metrics. However, unlike Li et al.’s evaluator, which can capture nuanced quality judgments, my BLEU-based reward is a proxy and may miss finer aspects of semantic fidelity.  
+
+**Quality-Guided Paraphrase Generation [Bandel et al., 2022]**  
+Bandel et al. (2022) address the lack of direct quality control in paraphrase generation by introducing a three-dimensional quality vector covering semantic similarity, syntactic variation, and lexical variation. Their model allows users to guide paraphrase generation explicitly along these axes. I adopted a simplified version of this idea via the optional `--quality_weights` argument, where users can specify weights for semantic, syntactic, and lexical components in the reward function. While this provides flexible control similar in spirit to Bandel et al., it is less sophisticated: I use lightweight proxies (sentence BLEU, length difference, and word overlap) instead of deep quality estimators. Still, this makes my system easy to integrate into SCST without retraining specialized quality models.  
+
+**Summary**  
+In comparison, Li et al. focus on reinforcement learning with a learned evaluator, Bandel et al. on explicit controllability of paraphrase quality, and my approach combines both ideas in a lightweight manner: using SCST for stability and simplicity, and offering user-configurable quality-guided rewards for controllability. This provides a middle ground between evaluator-heavy RL and fully controlled architectures, balancing reproducibility, interpretability, and practical performance.  
+
+
+
+
