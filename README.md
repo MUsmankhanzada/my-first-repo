@@ -54,9 +54,7 @@ For each batch, decode a greedy baseline (no sampling) and a stochastic sample (
 | RL Epoch 5 | 37.558 | 43.463 | *31.392* |
 | RL Epoch 6 | 39.520 | 39.660 | *30.142* |
 
-> Table columns: (presumed) [some metric 1] | [some metric 2] | *Penalized BLEU* (highlighted).  
-> (Keep the original table cell order/values as provided.)
-
+> Table columns:[Bleu_score]   | [Bleu score with input] | *Penalized BLEU* (highlighted).  
 ---
 
 ## Discussion
@@ -94,10 +92,3 @@ For each batch, decode a greedy baseline (no sampling) and a stochastic sample (
 - Keep advantage normalization and the variance guard (`skip PG if std(A) < 1e−6`) to avoid degenerate PG updates.  
 - Mix a stable MLE term (e.g., λ_rl = 0.3) to preserve fluency.  
 - Save the best model only when dev penalized BLEU improves; reload at the end for downstream inference.
-
----
-
-*If you'd like, I can:*
-- save this as a `.md` file and provide it for download, or  
-- shorten it into a one-paragraph abstract suitable for a paper/workshop submission.
-
